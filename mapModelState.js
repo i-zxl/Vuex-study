@@ -1,6 +1,11 @@
 function normalizeNamespace (fn) {
   // namespace: 'a/b.c' || 'a/b'
   return (dir, map, mutation) => {
+    if (typeof dir !== 'string') {
+      map = dir
+      dir = ''
+      mutation = map
+    }
     let dirMap = dir.split('.'), 
         path = '', namespace = ''
     if (dirMap.length > 1) {
