@@ -1,3 +1,21 @@
+export const mapModelState = normalizeNamespace((namespace, map, path, mutation) => {
+  let res = {}
+  for(let i of map) {
+    res[i] = {
+      get () {
+        return getModuleByNamespace(this.$store, path, namespace).state[i]
+      },
+      set (val) {
+        return getModuleByNamespace(this.$store, path, namespace).commit(mutation, {
+          key: i,
+          val: val
+        })
+      }
+    }
+  }
+  return res
+})
+
 function normalizeNamespace (fn) {
   // namespace: 'a/b.c' || 'a/b'
   return (dir, map, mutation) => {
@@ -20,24 +38,6 @@ function normalizeNamespace (fn) {
     return fn(namespace, map, path, mutation)
   }
 }
-
-export const mapModelState = normalizeNamespace((namespace, map, path, mutation) => {
-  let res = {}
-  for(let i of map) {
-    res[i] = {
-      get () {
-        return getModuleByNamespace(this.$store, path, namespace).state[i]
-      },
-      set (val) {
-        return getModuleByNamespace(this.$store, path, namespace).commit(mutation, {
-          key: i,
-          val: val
-        })
-      }
-    }
-  }
-  return res
-})
 
 function getModuleByNamespace (store, path, namespace) {
   let state = store.state
