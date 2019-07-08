@@ -22,28 +22,15 @@ function normalizeNamespace (fn) {
 }
 
 export const mapModelState = normalizeNamespace((namespace, map, path, mutation) => {
-  let state = this.$store.state
-  let commit = this.$store.commit
-  if (namespace) {
-    const _module = this.$store._modulesNamespaceMap[namespace]
-    if (!_module) {
-      return 
-    }
-    state = _module.state
-    commit = _module.commit
-  }
-  if (path) {
-    state = state[path]
-  }
   let res = {}
   for(let i of map) {
     res[i] = {
       get () {
-        return state[i]
+        return getModuleByNamespace(this.$store, path, namespace).state[i]
       },
       set (val) {
-        return commit(mutation, {
-          key: path,
+        return getModuleByNamespace(this.$store, path, namespace).commit(mutation, {
+          key: i,
           val: val
         })
       }
@@ -51,5 +38,23 @@ export const mapModelState = normalizeNamespace((namespace, map, path, mutation)
   }
   return res
 })
- 
 
+function getModuleByNamespace (store, path, namespace) {
+  let state = store.state
+  let commit = store.commit
+  if (namespace) {
+    const _module = store._modulesNamespaceMap[namespace]
+    if (!_module) {
+      return 
+    }
+    state = _module.context.state
+    commit = _module.context.commit
+  }
+  if (path) {
+    state = state[path]
+  }
+  return {
+    state,
+    commit
+  }
+}
