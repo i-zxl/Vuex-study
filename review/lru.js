@@ -28,9 +28,7 @@ class LRU {
     return value
   }
   del (key) {
-    let value = this.hashMap.get(key)
-    if (!value) return 
-    
+    console.log('merge')
     this.hashMap.delete(this.Firstkey)
     this.Firstkey = getFirstkey()
   }
