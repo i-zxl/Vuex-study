@@ -59,6 +59,20 @@ vuex中不存在module拆分，则_modules就是Module实例;如果存在，则�
 ```
 ### Vuex核心部分installModule
 
-这里会判断module的namespace是否存在，不存在不会对dispatch和commit做处理，如果存在，给type加上namespace，如果声明了{root: true}也不做处理，另外getters和state需要延迟处理，需要等数据更新后才进行计算，所以使用Object.defineProperties的getter函数，当访问的时候再进行计算。
+这里会判断module的namespace是否存在，不存在不会对dispatch和commit做处理，如果存在，将module放入_modulesNamespaceMap中，如果声明了{root: true}也不做处理，另外getters和state需要延迟处理，需要等数据更新后才进行计算，所以使用Object.defineProperties的getter函数，当访问的时候再进行计算。
+
+```js
+  // 非root和热跟新模块， 把当前module中state挂载到父组件的state上，
+  if (!isRoot && !hot) {
+    const parentState = getNestedState(rootState, path.slice(0, -1))
+    const moduleName = path[path.length - 1]
+    store._withCommit(() => {
+      Vue.set(parentState, moduleName, module.state)
+    })
+  }
+
+  // 生成当前模块的上下文，
 
 
+
+```
